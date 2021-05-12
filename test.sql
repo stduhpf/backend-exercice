@@ -1,6 +1,1 @@
-INSERT INTO users (name) VALUES ('toto');
-INSERT INTO parcelle (parcelle_id,surface,addresse,ville)
-
-
-
-select * from users;
+SELECT parcelle.addresse, parcelle.surface, projet.date_creation, projet.chiffre_affaire FROM projet INNER JOIN parcelle ON parcelle.parcelle_id = projet.parcelle_id WHERE parcelle.ville = 'Montreuil'

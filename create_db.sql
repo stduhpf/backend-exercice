@@ -2,9 +2,9 @@
 Ccreation des tables de la base de données
 */
 
-DROP TABLE users;
-DROP TABLE projet;
-DROP TABLE parcelle;
+DROP TABLE users    CASCADE;
+DROP TABLE projet   CASCADE;
+DROP TABLE parcelle CASCADE;
 
 
 CREATE TABLE IF NOT EXISTS users(
@@ -26,6 +26,6 @@ CREATE TABLE IF NOT EXISTS projet(
     statut          varchar(10) CONSTRAINT statchk CHECK(statut = 'en cours' OR statut = 'terminé' OR statut = 'abandonné'),
     parcelle_id     integer,
     users_id        integer,
-    CONSTRAINT fk_parcelle  FOREIGN KEY(parcelle_id)    REFERENCES parcelle(parcelle_id),
-    CONSTRAINT fk_users     FOREIGN KEY(users_id)       REFERENCES users(id)
+    CONSTRAINT fk_parcelle  FOREIGN KEY(parcelle_id)    REFERENCES parcelle(parcelle_id)    ON DELETE CASCADE,
+    CONSTRAINT fk_users     FOREIGN KEY(users_id)       REFERENCES users(id)                ON DELETE CASCADE
 );

@@ -14,7 +14,7 @@ def main():
     if request.method == "GET":
         return (request.args.get("code_postal"))
 
-    cursor.execute("SELECT parcelle.addresse, parcelle.surface, projet.date_creation, projet.chiffre_affaire FROM projet INNER JOIN parcelle ON parcelle.parcelle_id = projet.parcelle_id WHERE parcelle.ville = 'Montreuil';")
+    cursor.execute("SELECT parcelle.addresse, parcelle.surface, projet.date_creation, projet.chiffre_affaire FROM projet INNER JOIN parcelle ON parcelle.parcelle_id = projet.parcelle_id WHERE parcelle.ville_id = ();")
     res = cursor.fetchall()
 
     cursor.execute("SELECT somme_ca('Paris','en cours');")

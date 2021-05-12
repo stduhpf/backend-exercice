@@ -40,3 +40,6 @@ INSERT INTO parcelle (parcelle_id,surface,addresse,ville) VALUES (41,14000,'6 ru
 INSERT INTO parcelle (parcelle_id,surface,addresse,ville) VALUES (98,698000,'51 rue de la Soif','Montreuil');
 
 INSERT INTO projet (date_creation,chiffre_affaire,statut,parcelle_id,users_id) VALUES ((SELECT make_date(2020, 07, 25)),69420,'en cours', 98, (SELECT FIRST_VALUE(id) OVER() FROM users WHERE users.name = 'toto'));
+INSERT INTO projet (date_creation,chiffre_affaire,statut,parcelle_id,users_id) VALUES ((SELECT make_date(2020, 08, 25)),2,'terminé', 42, (SELECT FIRST_VALUE(id) OVER() FROM users WHERE users.name = 'tata'));
+INSERT INTO projet (date_creation,chiffre_affaire,statut,parcelle_id,users_id) VALUES ((SELECT make_date(2021, 07, 25)),100000,'en cours', 41, (SELECT FIRST_VALUE(id) OVER() FROM users WHERE users.name = 'tata'));
+INSERT INTO projet (date_creation,chiffre_affaire,statut,parcelle_id,users_id) VALUES ((SELECT make_date(2020, 07, 20)),100052,'en cours', 41, (SELECT FIRST_VALUE(id) OVER() FROM users WHERE users.name = 'tata'));

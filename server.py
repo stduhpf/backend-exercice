@@ -33,7 +33,7 @@ def main():
     res = []
     somme = 0
     if postcode != None:
-        cursor.execute("SELECT parcelle.addresse, parcelle.surface, projet.date_creation, projet.chiffre_affaire, projet.statut, projet.id FROM projet INNER JOIN parcelle ON parcelle.parcelle_id = projet.parcelle_id WHERE parcelle.code_postal = %s;", (postcode,))
+        cursor.execute("SELECT parcelle.adresse, parcelle.surface, projet.date_creation, projet.chiffre_affaire, projet.statut, projet.id FROM projet INNER JOIN parcelle ON parcelle.parcelle_id = projet.parcelle_id WHERE parcelle.code_postal = %s;", (postcode,))
         res = cursor.fetchall()
     if (postcode != None) & (statut != None):
         cursor.execute("SELECT somme(%s, %s);", (postcode, statut,))
@@ -41,7 +41,7 @@ def main():
     if somme == None:
         somme = 0
 
-    cursor.execute("SELECT code_postal FROM ville ORDER BY code_postal")
+    cursor.execute("SELECT code_postal,nom FROM ville ORDER BY code_postal")
     postcodesList = cursor.fetchall()
     if postcode == None:
         postcode = ""
@@ -71,16 +71,21 @@ def json():
     return connexion.encoding + jsonStr
 
 
-@app.route("/changeStatut/", methods=['GET'])
+@app.route("/changeStatut/", methods=['POST'])
 def statut():
     cursor = connexion.cursor()
-    id = None
-    statut = None
-    if request.method == "GET":
-        id = request.args.get("id")
-        statut = request.args.get("statut")
+    id = request.form.get("id")
+    statut = request.form.get("statut")
     if id != None:
         cursor.execute(
-            "UPDATE projet SET statut = %s WHERE id = %s", (statut, id,))
-        connexion.commit()
+            "SELECT statut FROM projet WHERE id = %s", (id,))
+        res = cursor.fetchall()[0][0]
+        if(res != statut):
+            if res != "en cours":
+                return "Erreur: il est interdit de change le statut de " + res + " a " + statut
+            cursor.execute(
+                "UPDATE projet SET statut = %s WHERE id = %s", (statut, id,))
+            connexion.commit()
+    else:
+        return "Erreur: Pas d'identifiant"
     return redirect(request.referrer)

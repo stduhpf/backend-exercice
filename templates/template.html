@@ -10,7 +10,7 @@
             {% for i in range(res|length) %}
                 <tr><td>{{res[i][0]}}</td><td>{{res[i][1]}}</td><td>{{res[i][2]}}</td><td>{{res[i][3]}} €</td>
                     <td>{% if res[i][4] == "en cours"%}
-                        <form method="GET" action="./changeStatut/">
+                        <form method="POST" action="./changeStatut/">
                             <table style="margin-left: auto;margin-right: auto;">
                                 <td><select id="statut" name="statut" value="{{res[i][4]}}" style="width: 100%;">
                                     <option value = "en cours" {% if res[i][4] == "en cours" %} selected {% endif %}>En cours</option>
@@ -39,7 +39,7 @@
                 <td><label>Code postal</label></td>
                 <td><select id="code_postal" name="code_postal"" style="text-align: right;">
                 {% for i in range(postcodesList|length) %}
-                    <option {% if postcode|int == postcodesList[i][0] %} selected {% endif %} >{{postcodesList[i][0]}}</option>
+                    <option value={{postcodesList[i][0]}} {% if postcode|int == postcodesList[i][0] %} selected {% endif %} >{{postcodesList[i][0]}} ({{postcodesList[i][1]}})</option>
                 {% endfor %}
 
                 </select></td>

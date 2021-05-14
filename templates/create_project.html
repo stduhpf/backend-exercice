@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<title>Création de projet</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous">
+<body style="margin: 50px;">
+    {% if parcelles|length > 0 %}
+        <form action="./" method="POST">
+            <table>
+                <tr>
+                    <td><label>Parcelle: </label></td>
+                    <td><select name="parcelle_id">
+                            {% for parcelle in parcelles %}
+                            <option value = {{ parcelle['parcelle_id'] }}>{{ parcelle['adresse'] }} (id:{{ parcelle['parcelle_id'] }})</option>
+                            {% endfor %}
+                    </select></td>
+                    <td><a href={{ '/addParcelle/?selected=' ~ parcelles[0]['code_postal'] }}><input type="button" value="Nouvelle parcelle?"></a></td>
+                </tr><tr>
+                    <td><label>CA attendu (en €)</label></td>
+                    <td><input type="text" name="ca"></td>
+                    <td><input type="submit"></td>
+                </tr>
+            </table>
+        </form>
+    {% else %}
+        <p> Pas de parcelle pour ce code postal</p>
+        <table>
+            <td><form action="./" method="GET"><input type="submit" value="Essayer avec un autre code postal"></form></td>
+            <td><a href="/addParcelle"><input type="button" value="Enregistrer une nouvelle parcelle"></a></td>
+        </table>
+    {% endif %}
+</body>

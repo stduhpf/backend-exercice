@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect
-from flask.helpers import flash
+from flask.globals import session
 import json as jn
 import psycopg2
 import psycopg2.extras
@@ -15,8 +15,8 @@ class DatetimeEncoder(jn.JSONEncoder):
 
 connexion = psycopg2.connect("dbname=buildrz user=postgres password=stdRoot")
 
-
 app = Flask(__name__)
+app.secret_key = 'fgjklwsdhwsxjkl'
 
 
 @app.route("/", methods=['GET'])
@@ -82,10 +82,106 @@ def statut():
         res = cursor.fetchall()[0][0]
         if(res != statut):
             if res != "en cours":
-                return "Erreur: il est interdit de change le statut de " + res + " a " + statut
+                return "Erreur: il est interdit de change le statut de " + res + " a " + statut, 400
             cursor.execute(
                 "UPDATE projet SET statut = %s WHERE id = %s", (statut, id,))
             connexion.commit()
     else:
-        return "Erreur: Pas d'identifiant"
+        return "Erreur: Pas d'identifiant", 400
     return redirect(request.referrer)
+
+
+@app.route("/addProject/", methods=['GET', 'POST'])
+def projectList():
+    postcode = None
+    parcelles = None
+    if request.method == "GET":
+        postcode = request.args.get("code_postal")
+
+    if postcode != None:
+        if str(postcode).isdigit():
+            cursor = connexion.cursor(
+                cursor_factory=psycopg2.extras.RealDictCursor)
+            cursor.execute(
+                "SELECT * FROM parcelle WHERE parcelle.code_postal = %s", (postcode,))
+            parcelles = cursor.fetchall()
+            return render_template("create_project.html", parcelles=parcelles, login=session.get('login'))
+
+    if request.method == "POST":
+        login = session.get('login')
+        parcelle_id = request.form.get("parcelle_id")
+        ca = request.form.get("ca")
+        if login == None:
+            return "Veuillez vous connecter", 401
+        cursor = connexion.cursor()
+        cursor.execute(
+            "INSERT INTO projet (date_creation,chiffre_affaire,statut,parcelle_id,username) VALUES ((SELECT NOW()),%s,'en cours', %s,%s);", (ca, parcelle_id, login,))
+        connexion.commit()
+    return render_template("ask_code.html")
+
+
+@app.route("/addParcelle/", methods=['GET', 'POST'])
+def createParcelle():
+    selected = None
+    if request.method == "POST":
+        code_postal = request.form.get('code_postal')
+        surface = request.form.get('surface')
+        adresse = request.form.get('adresse')
+        parcelle_id = request.form.get('parcelle_id')
+        try:
+            cursor = connexion.cursor()
+            cursor.execute(
+                "SELECT * FROM parcelle WHERE parcelle_id = %s", (parcelle_id,))
+            if(len(cursor.fetchall()) != 0):
+                return "Erreur, identifiant non unique", 400
+
+            cursor.execute(
+                "INSERT INTO parcelle (parcelle_id,surface,adresse,code_postal) VALUES (%s, %s, %s, %s)", (parcelle_id, surface, adresse, code_postal,))
+            connexion.commit()
+        except Exception as e:
+            return "Erreur, impossible d'insérer la nouvelle parcelle "+code_postal + ' '+surface+' '+adresse+' '+parcelle_id + ' (' + str(e) + ')', 400
+
+    cursor = connexion.cursor(
+        cursor_factory=psycopg2.extras.RealDictCursor)
+    cursor.execute("SELECT * FROM ville")
+    villes = cursor.fetchall()
+    if request.method == 'GET':
+        selected = request.args.get('selected')
+    return render_template("create_parcelle.html", villes=villes, selected=selected)
+
+
+@app.route("/addVille/", methods=['GET', 'POST'])
+def createVille():
+    if request.method == "POST":
+        code_postal = request.form.get('code_postal')
+        nom = request.form.get('nom')
+        try:
+            cursor = connexion.cursor()
+            cursor.execute(
+                "SELECT * FROM ville WHERE code_postal = %s", (code_postal,))
+            if(len(cursor.fetchall()) != 0):
+                return "Erreur, code postal non unique", 400
+
+            cursor.execute(
+                "INSERT INTO ville (code_postal,nom) VALUES (%s, %s)", (code_postal, nom,))
+            connexion.commit()
+        except Exception as e:
+            return "Erreur, impossible de créer la nouvelle ville"+code_postal + ' ' + nom + ' (' + str(e) + ')', 400
+
+    return render_template("create_ville.html")
+
+
+@app.route("/login")
+def loginPage():
+    cursor = connexion.cursor(
+        cursor_factory=psycopg2.extras.RealDictCursor)
+    cursor.execute("SELECT * FROM users")
+    users = cursor.fetchall()
+    return render_template("login.html", users=users)
+
+
+@app.route("/loginValidate", methods=['POST'])
+def login():
+    login = request.form['login']
+    session['login'] = login
+    return redirect("/")

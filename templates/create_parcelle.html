@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<title>Création de parcelle</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous">
+<body style="margin: 50px;">
+    <form action="./" method="POST">
+        <table>
+            <tr>
+                <td><label>ville :</label></td>
+                <td><select name="code_postal">
+                    {% for ville in villes %}
+                    <option value={{ ville['code_postal'] }} {% if selected|string() == ville['code_postal']|string() %} selected {% endif %}>
+                    {{ ville['nom'] }} ({{ville['code_postal']}})</option>
+                    {% endfor %}
+                </select></td>
+                <td><a href="/addVille"><input type="button" value="Autre ville"></a></td>
+            </tr><tr>
+                <td><label>adresse :</label></td>
+                <td><input type="text" name="adresse"></td>
+            </tr><tr>        
+                <td><label>surface :</label></td>
+                <td><input type="text" name="surface"></td>
+            </tr><tr>
+                <td><label>Numéro d'identification :</label></td>
+                <td><input type="text" name="parcelle_id"></td>
+            </tr><tr>
+                <td><input type="submit"></td>
+            </tr>
+        </table>
+    </form>
+   
+</body>

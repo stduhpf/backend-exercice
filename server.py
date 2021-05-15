@@ -24,8 +24,9 @@ app.secret_key = 'fgjklwsdhwsxjkl'
 # route principale (affichage de tous les projets d'une ville, ainsi que le total du ca des projets avec un certain statut)
 @app.route("/", methods=['GET'])
 def main():
-    cursor = connexion.cursor()
-
+    # création d'un curseur permettant l'utilisation de dictionnaires
+    cursor = connexion.cursor(
+        cursor_factory=psycopg2.extras.RealDictCursor)
     postcode = None
     statut = None
 
@@ -33,16 +34,16 @@ def main():
         postcode = request.args.get("code_postal")
         statut = request.args.get("statut")
 
-    res = []
+    projets = []
     somme = 0
     if postcode != None:
         # récuperation des la liste des projets correspondants
         cursor.execute("SELECT parcelle.adresse, parcelle.surface, projet.date_creation, projet.chiffre_affaire, projet.statut, projet.id FROM projet INNER JOIN parcelle ON parcelle.parcelle_id = projet.parcelle_id WHERE parcelle.code_postal = %s;", (postcode,))
-        res = cursor.fetchall()
+        projets = cursor.fetchall()
     if (postcode != None) & (statut != None):
         # calcul de la somme a l'aide d'une fonction SQL
         cursor.execute("SELECT somme(%s, %s);", (postcode, statut,))
-        somme = cursor.fetchall()[0][0]
+        somme = cursor.fetchall()[0]['somme']
     if somme == None:
         somme = 0
 
@@ -55,7 +56,7 @@ def main():
         postcode = ""
     if statut == None:
         statut = "en cours"
-    return render_template("template.html", res=res, somme=somme, postcode=postcode, statut=statut, postcodesList=postcodesList)
+    return render_template("template.html", projets=projets, somme=somme, postcode=postcode, statut=statut, postcodesList=postcodesList)
 
 
 # route permettant de récupérer la liste des projets au format Json
@@ -70,17 +71,17 @@ def json():
     if request.method == "GET":
         postcode = request.args.get("code_postal")
 
-    res = dict()
+    projets = dict()
     if postcode != None:
         cursor.execute(
             "SELECT * FROM projet INNER JOIN parcelle ON parcelle.parcelle_id = projet.parcelle_id WHERE parcelle.code_postal = %s;", (postcode,))
     else:
         cursor.execute(
             "SELECT * FROM projet INNER JOIN parcelle ON parcelle.parcelle_id = projet.parcelle_id")
-    res = cursor.fetchall()
+    projets = cursor.fetchall()
 
     # utilisation du DatetimeEncoder pour sérialiser les dates
-    jsonStr = jn.dumps(res, cls=DatetimeEncoder)
+    jsonStr = jn.dumps(projets, cls=DatetimeEncoder)
     return jsonStr
 
 
@@ -131,7 +132,7 @@ def projectList():
                 "SELECT * FROM parcelle WHERE parcelle.code_postal = %s", (postcode,))
             parcelles = cursor.fetchall()
             # affichage de la liste des parcelles
-            return render_template("create_project.html", parcelles=parcelles)
+            return render_template("create_project.html", parcelles=parcelles, code_postal=postcode)
 
     if request.method == "POST":
         login = session.get('login')

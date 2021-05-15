@@ -10,9 +10,10 @@ DROP TABLE ville    CASCADE;
 
 
 CREATE TABLE IF NOT EXISTS users(
+    /* Le nom d'utillisateur doit etre unique */
     name    varchar(40)     CONSTRAINT pkuser PRIMARY KEY
     /*
-    possibilité d'ajouter des pass hashés
+    possibilité d'ajouter des mots de passes hashés si necessaire
     */
 );
 

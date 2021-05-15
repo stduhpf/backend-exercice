@@ -1,3 +1,6 @@
+<!--
+    Page d'accueil
+-->
 <!DOCTYPE html>
 <title>Webserver</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous">
@@ -7,22 +10,25 @@
             <tr><th>adresse</th><th>surface</th><th>date de création</th><th>chiffre d'affaires</th><th>statut</th></tr>
         </thead>
         <tbody>
-            {% for i in range(res|length) %}
-                <tr><td>{{res[i][0]}}</td><td>{{res[i][1]}}</td><td>{{res[i][2]}}</td><td>{{res[i][3]}} €</td>
-                    <td>{% if res[i][4] == "en cours"%}
+            <!--Liste des projets-->
+            {% for projet in projets %}
+                <tr><td>{{projet['adresse']}}</td><td>{{projet['surface']}}</td><td>{{projet['date_creation']}}</td><td>{{projet['chiffre_affaire']}} €</td>
+                    <td>
+                        {% if projet['statut'] == "en cours"%}
+                        <!--Formulaire de changement de statut du projet-->
                         <form method="POST" action="./changeStatut/">
                             <table style="margin-left: auto;margin-right: auto;">
-                                <td><select id="statut" name="statut" value="{{res[i][4]}}" style="width: 100%;">
-                                    <option value = "en cours" {% if res[i][4] == "en cours" %} selected {% endif %}>En cours</option>
-                                    <option value = "terminé" {% if res[i][4] == "terminé" %} selected {% endif %}>Terminé</option>
-                                    <option value = "abandonné"{% if res[i][4] == "abandonné" %} selected {% endif %}>Abandonné</option>
+                                <td><select id="statut" name="statut" value="{{projet['statut']}}" style="width: 100%;">
+                                    <option value = "en cours" {% if projet['statut'] == "en cours" %} selected {% endif %}>En cours</option>
+                                    <option value = "terminé" {% if projet['statut'] == "terminé" %} selected {% endif %}>Terminé</option>
+                                    <option value = "abandonné"{% if projet['statut'] == "abandonné" %} selected {% endif %}>Abandonné</option>
                                 </select></td>
-                                <input type="hidden" name="id" value="{{res[i][5]}}">
+                                <input type="hidden" name="id" value="{{projet['id']}}">
                                 <td><input type="submit" value="modifier"></td>
                             </table>
                         </form>
                         {% else %}
-                            {{res[i][4]}}
+                            {{projet['statut']}}
                         {% endif %}
                     </td>
                 </tr>
@@ -33,13 +39,14 @@
     <p> Total du CA des projets avec statut "{{statut}}" =
         {{somme}} €
     </p>
+    <!--Formulaire pour choisir la ville des projets a afficher, et le statut dont on souhaite avoir la somme-->
     <form method="GET" action="./">
         <table class="table" style="width: fit-content;">
             <tr>
                 <td><label>Code postal</label></td>
                 <td><select id="code_postal" name="code_postal"" style="text-align: right;">
-                {% for i in range(postcodesList|length) %}
-                    <option value={{postcodesList[i][0]}} {% if postcode|int == postcodesList[i][0] %} selected {% endif %} >{{postcodesList[i][0]}} ({{postcodesList[i][1]}})</option>
+                {% for ville in postcodesList %}
+                    <option value={{ville['code_postal']}} {% if postcode|int == ville['code_postal'] %} selected {% endif %} >{{ville['code_postal']}} ({{ville['nom']}})</option>
                 {% endfor %}
 
                 </select></td>

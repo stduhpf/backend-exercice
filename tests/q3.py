@@ -1,3 +1,5 @@
+# test psycopg2
+
 import psycopg2
 
 connexion = psycopg2.connect("dbname=buildrz user=postgres password=stdRoot")

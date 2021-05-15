@@ -56,4 +56,4 @@ INSERT INTO parcelle (parcelle_id,surface,adresse,code_postal) VALUES (96,698000
 INSERT INTO projet (date_creation,chiffre_affaire,statut,parcelle_id,username) VALUES ((SELECT make_date(2020, 07, 25)),69420,'en cours', 96,'toto');
 INSERT INTO projet (date_creation,chiffre_affaire,statut,parcelle_id,username) VALUES ((SELECT make_date(2020, 08, 25)),2,'terminé', 42, 'tata');
 INSERT INTO projet (date_creation,chiffre_affaire,statut,parcelle_id,username) VALUES ((SELECT make_date(2021, 07, 25)),100000,'en cours', 41, 'tata');
-INSERT INTO projet (date_creation,chiffre_affaire,statut,parcelle_id,username) VALUES ((SELECT make_date(2020, 07, 20)),100052,'en cours', 41, 'toto');
+INSERT INTO projet (date_creation,chiffre_affaire,statut,parcelle_id,username) VALUES ((SELECT make_date(2020, 07, 20)),152,'en cours', 41, 'toto');

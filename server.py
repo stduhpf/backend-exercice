@@ -231,7 +231,10 @@ def login():
 # déconnexion
 @app.route("/logout")
 def logout():
-    session.pop('login')
+    try:
+        session.pop('login')
+    except:
+        pass
     return redirect("/")
 
 
